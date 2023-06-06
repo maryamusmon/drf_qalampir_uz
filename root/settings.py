@@ -44,6 +44,8 @@ INSTALLED_APPS = [
     'drf_yasg',
     'rest_framework',
     'rest_framework_simplejwt',
+    'mptt',
+    'django_filters',
 ]
 
 MIDDLEWARE = [
@@ -128,6 +130,14 @@ STATIC_ROOT = os.path.join(BASE_DIR / 'static')
 
 MEDIA_URL = 'media/'
 MEDIA_ROOT = os.path.join(BASE_DIR / 'media')
+
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
+}
+
+
 
 
 # Default primary key field type

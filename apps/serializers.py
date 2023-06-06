@@ -1,26 +1,24 @@
 from rest_framework.serializers import ModelSerializer
 
-
 # add serializers
 from rest_framework.serializers import ModelSerializer
 
-from api_crud.models import Product, Category
+from apps.models import Category, Product
 
 
-class CategorySerializer(ModelSerializer):
+class CategoryModelSerializer(ModelSerializer):
     class Meta:
         model = Category
-        fields = '__all__'
+        fields = ('id', 'name')
+
+    def to_representation(self, instance):
+        represent = super().to_representation(instance)
+        data = CategoryModelSerializer(instance.children.all(), many=True).data
+        represent['children'] = data if data else None
+        return represent
 
 
-
-class ProductSerializer(ModelSerializer):
-    class Meta:
-        model = Product
-        fields = ('title', 'short_description', 'image')
-
-
-class ProductCreateSerializer(ModelSerializer):
+class ProductModelSerializer(ModelSerializer):
     class Meta:
         model = Product
         fields = '__all__'
