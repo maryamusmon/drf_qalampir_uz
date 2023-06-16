@@ -15,7 +15,6 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
@@ -27,10 +26,10 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-
 # Application definition
 
 INSTALLED_APPS = [
+    'modeltranslation',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -40,12 +39,13 @@ INSTALLED_APPS = [
     # My Apps
     'apps',
 
-    #Swagger
+    # Swagger
     'drf_yasg',
     'rest_framework',
     'rest_framework_simplejwt',
     'mptt',
     'django_filters',
+    "django_celery_results",
 ]
 
 MIDDLEWARE = [
@@ -53,6 +53,7 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -79,7 +80,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'root.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
@@ -89,7 +89,6 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -109,18 +108,22 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
+
+LANGUAGES = (
+    ('en', 'English'),
+    ('ru', 'Russian'),
+    ('uz', 'Uzbek'),
+)
 
 TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
@@ -131,14 +134,17 @@ STATIC_ROOT = os.path.join(BASE_DIR / 'static')
 MEDIA_URL = 'media/'
 MEDIA_ROOT = os.path.join(BASE_DIR / 'media')
 
+MODELTRANSLATION_LANGUAGES = ('ru', 'en', 'uz')
+MODELTRANSLATION_DEFAULT_LANGUAGE = 'uz'
 
+LOCALE_PATHS = [
+    BASE_DIR / 'locale/',
+]
 
 REST_FRAMEWORK = {
+
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
 }
-
-
-
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -146,10 +152,34 @@ REST_FRAMEWORK = {
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # MinIO services settings
-DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+# DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+#
+# AWS_ACCESS_KEY_ID = os.getenv("MINIO_ROOT_USER")
+# AWS_SECRET_ACCESS_KEY = os.getenv("MINIO_ROOT_PASSWORD")
+# AWS_STORAGE_BUCKET_NAME = os.getenv("MINIO_BUCKET_NAME")
+# AWS_S3_ENDPOINT_URL = os.getenv("MINIO_ENDPOINT")
 
-AWS_ACCESS_KEY_ID = os.getenv("MINIO_ROOT_USER")
-AWS_SECRET_ACCESS_KEY = os.getenv("MINIO_ROOT_PASSWORD")
-AWS_STORAGE_BUCKET_NAME = os.getenv("MINIO_BUCKET_NAME")
-AWS_S3_ENDPOINT_URL = os.getenv("MINIO_ENDPOINT")
 
+# Celery
+
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'django-db'
+CELERY_CACHE_BACKEND = 'django-cache'
+
+CELERY_BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 3600}
+
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60
+
+CELERY_TIMEZONE = "Asia/Tashkent"
+
+
+# SMTP
+EMAIL_HOST=os.getenv('EMAIL_HOST')
+EMAIL_PORT=os.getenv('EMAIL_PORT')
+EMAIL_HOST_USER=os.getenv('EMAIL_HOST_USER')
+EMAIL_PASSWORD=os.getenv('EMAIL_PASSWORD')
+EMAIL_USE_TLS=os.getenv('EMAIL_USE_TLS')

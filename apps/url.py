@@ -1,12 +1,16 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
-from apps.views import CategoryListCreateAPIView, ProductModelViewSet
+from apps.views import CategoryModelViewSet, BlogModelViewSet, BlogDetailRetrieveAPIView, SearchModelSearchAPIView, \
+    SendMailAPIView
 
 routers = DefaultRouter()
-routers.register('product_mixins', ProductModelViewSet, '')
-urlpatterns =[
+routers.register('blog', BlogModelViewSet)
+routers.register('category', CategoryModelViewSet)
+
+urlpatterns = [
     path('', include(routers.urls)),
-    path('category', CategoryListCreateAPIView.as_view(), name='category'),
-    # path('product', ProductModelViewSet.as_view(), name='product')
+    path('blog_detail/<int:pk>', BlogDetailRetrieveAPIView.as_view()),
+    path('search', SearchModelSearchAPIView.as_view()),
+    path('send_email', SendMailAPIView.as_view()),
 ]

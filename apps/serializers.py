@@ -1,9 +1,9 @@
-from rest_framework.serializers import ModelSerializer
+from rest_framework.fields import CharField, EmailField
 
 # add serializers
-from rest_framework.serializers import ModelSerializer
+from rest_framework.serializers import ModelSerializer, Serializer
 
-from apps.models import Category, Product
+from apps.models import Category, Blog
 
 
 class CategoryModelSerializer(ModelSerializer):
@@ -18,7 +18,20 @@ class CategoryModelSerializer(ModelSerializer):
         return represent
 
 
-class ProductModelSerializer(ModelSerializer):
+class BlogModelSerializer(ModelSerializer):
     class Meta:
-        model = Product
-        fields = '__all__'
+        model = Blog
+        exclude = ()
+
+
+class SearchModelSerializer(ModelSerializer):
+    class Meta:
+        model = Blog
+        fields = ('title', 'description')
+
+
+class SendEmailSerializer(Serializer):
+    name = CharField(max_length=100)
+    email = EmailField()
+    phone = CharField(max_length=55)
+    message = CharField(max_length=500)
